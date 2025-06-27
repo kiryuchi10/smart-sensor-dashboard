@@ -1,18 +1,34 @@
-export default function CellGrid({ cells }) {
+// frontend/src/components/CellGrid.jsx
+import React from 'react';
+
+const CellGrid = ({ cells, onCellSelect }) => {
+  const getCellStatusClass = (cell) => {
+    if (cell.status === 'fault' || cell.voltage < 3.5) return 'cell-fault';
+    if (cell.status === 'low' || cell.soc < 30) return 'cell-warning';
+    if (cell.status === 'high' || cell.soc > 90) return 'cell-high';
+    return 'cell-normal';
+  };
+
   return (
-    <div className="grid grid-cols-4 gap-4">
-      {cells.map((cell, i) => (
-        <div key={i} className="p-2 rounded shadow text-center text-white" style={{ backgroundColor: cell.soc > 70 ? "#4ade80" : "#f87171" }}>
-          <img
-            src={cell.soc > 70 ? "/assets/battery_green.svg" : "/assets/battery_red.svg"}
-            alt="battery icon"
-            className="mx-auto w-6 h-6"
-          />
-          <div className="text-sm font-bold">{cell.id}</div>
-          <div>{cell.voltage?.toFixed(2)}V</div>
-          <div>SoC: {cell.soc.toFixed(1)}%</div>
+    <div className="cell-grid">
+      {cells.map((cell, index) => (
+        <div 
+          key={cell.id}
+          className={`cell-item ${getCellStatusClass(cell)}`}
+          onClick={() => onCellSelect(cell.id)}
+        >
+          <div className="cell-header">
+            <span className="cell-id">{cell.id}</span>
+            <span className="cell-voltage">{cell.voltage}V</span>
+          </div>
+          <div className="cell-soc">
+            <span className="soc-label">SoC</span>
+            <span className="soc-value">{cell.soc}%</span>
+          </div>
         </div>
       ))}
     </div>
   );
-}
+};
+
+export default CellGrid;

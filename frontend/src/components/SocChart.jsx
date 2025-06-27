@@ -1,52 +1,89 @@
-import { useEffect, useRef } from "react";
-import * as d3 from "d3";
+// frontend/src/components/SocChart.jsx
+import React, { useEffect, useRef } from 'react';
+import * as d3 from 'd3';
 
-export default function SocChart({ socData }) {
+const SocChart = ({ data, width = 400, height = 200 }) => {
   const svgRef = useRef();
 
   useEffect(() => {
-    if (!socData || socData.length === 0) return;
+    if (!data || data.length === 0) return;
 
     const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove(); // Clear previous content
+    svg.selectAll('*').remove();
 
-    const width = 300;
-    const height = 150;
-    const margin = { top: 10, right: 10, bottom: 30, left: 30 };
+    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
 
-    svg.attr("viewBox", [0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom]);
+    const g = svg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const chartArea = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    // Prepare data
+    const chartData = data.map((d, i) => ({
+      id: d.id,
+      soc: d.soc,
+      index: i
+    }));
 
-    const x = d3.scaleBand()
-      .domain(socData.map(d => d.id))
-      .range([0, width])
-      .padding(0.2);
+    // Scales
+    const xScale = d3.scaleBand()
+      .domain(chartData.map(d => d.id))
+      .range([0, chartWidth])
+      .padding(0.1);
 
-    const y = d3.scaleLinear()
+    const yScale = d3.scaleLinear()
       .domain([0, 100])
-      .range([height, 0]);
+      .range([chartHeight, 0]);
 
-    // Axis
-    chartArea.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x));
+    // Color scale
+    const colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
+      .domain([0, 100]);
 
-    chartArea.append("g")
-      .call(d3.axisLeft(y).ticks(5));
+    // Add axes
+    g.append('g')
+      .attr('transform', `translate(0,${chartHeight})`)
+      .call(d3.axisBottom(xScale))
+      .selectAll('text')
+      .style('fill', 'white');
 
-    // Bars
-    chartArea.selectAll("rect")
-      .data(socData)
-      .enter()
-      .append("rect")
-      .attr("x", d => x(d.id))
-      .attr("y", d => y(d.soc))
-      .attr("width", x.bandwidth())
-      .attr("height", d => height - y(d.soc))
-      .attr("fill", d => d.soc > 70 ? "#4ade80" : "#f87171"); // green or red
-  }, [socData]);
+    g.append('g')
+      .call(d3.axisLeft(yScale).ticks(5))
+      .selectAll('text')
+      .style('fill', 'white');
 
-  return <svg ref={svgRef} className="w-full h-48" />;
-}
+    // Add bars
+    g.selectAll('.bar')
+      .data(chartData)
+      .enter().append('rect')
+      .attr('class', 'bar')
+      .attr('x', d => xScale(d.id))
+      .attr('width', xScale.bandwidth())
+      .attr('y', d => yScale(d.soc))
+      .attr('height', d => chartHeight - yScale(d.soc))
+      .attr('fill', d => colorScale(d.soc))
+      .attr('stroke', '#333')
+      .attr('stroke-width', 1);
+
+    // Add value labels
+    g.selectAll('.label')
+      .data(chartData)
+      .enter().append('text')
+      .attr('class', 'label')
+      .attr('x', d => xScale(d.id) + xScale.bandwidth() / 2)
+      .attr('y', d => yScale(d.soc) - 5)
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'white')
+      .attr('font-size', '10px')
+      .text(d => `${d.soc.toFixed(1)}%`);
+
+  }, [data, width, height]);
+
+  return (
+    <div className="chart-wrapper">
+      <h3 className="chart-title">State of Charge</h3>
+      <svg ref={svgRef} width={width} height={height}></svg>
+    </div>
+  );
+};
+
+export default SocChart;

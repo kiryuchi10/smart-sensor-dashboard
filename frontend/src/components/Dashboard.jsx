@@ -1,54 +1,147 @@
-import { useEffect, useState } from "react";
-import CellGrid from "./CellGrid";
-import BatteryModule from "./BatteryModule";
-import AlarmStatus from "./AlarmStatus";
-import TempChart from "./TempChart";
-import TimestampBar from "./TimestampBar";
+// frontend/src/components/Dashboard.jsx
+import React, { useState, useEffect } from 'react';
+import BatteryModule from './BatteryModule';
+import CellGrid from './CellGrid';
+import TempChart from './TempChart';
+import SocChart from './SocChart';
+import AlarmStatus from './AlarmStatus';
+import TemperatureBar from './TemperatureBar';
+import TimestampBar from './TimestampBar';
+import LeftPanelButtons from './LeftPanelButtons';
 
-export default function Dashboard() {
-  const [cells, setCells] = useState([
-    { id: "E1", soc: 66.7, voltage: 3.90 },
-    { id: "E2", soc: 67.9, voltage: 3.91 },
-    { id: "E3", soc: 69.0, voltage: 3.92 },
-    { id: "E4", soc: 70.0, voltage: 3.90 },
-    { id: "E5", soc: 79.8, voltage: 3.99 }
-  ]);
-  const [temps, setTemps] = useState([27.8, 26.6, 25.9, 18.5]);
-  const [lastUpdate, setLastUpdate] = useState(new Date());
+const Dashboard = () => {
+  const [batteryData, setBatteryData] = useState(null);
+  const [temperatureData, setTemperatureData] = useState([]);
+  const [systemOverview, setSystemOverview] = useState(null);
+  const [activeAlarms, setActiveAlarms] = useState([]);
+  const [selectedBattery, setSelectedBattery] = useState('M1');
+  const [currentView, setCurrentView] = useState('dashboard');
 
+  // API base URL
+  const API_BASE = 'http://localhost:5000/api';
+
+  // Fetch battery cell data
+  const fetchBatteryData = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/battery/cells`);
+      const data = await response.json();
+      setBatteryData(data);
+    } catch (error) {
+      console.error('Error fetching battery data:', error);
+    }
+  };
+
+  // Fetch temperature data for charts
+  const fetchTemperatureData = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/battery/temperature?limit=20`);
+      const data = await response.json();
+      setTemperatureData(data.temperature_data || []);
+    } catch (error) {
+      console.error('Error fetching temperature data:', error);
+    }
+  };
+
+  // Fetch system overview
+  const fetchSystemOverview = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/battery/overview`);
+      const data = await response.json();
+      setSystemOverview(data);
+    } catch (error) {
+      console.error('Error fetching system overview:', error);
+    }
+  };
+
+  // Fetch active alarms
+  const fetchActiveAlarms = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/battery/alarms`);
+      const data = await response.json();
+      setActiveAlarms(data.alarms || []);
+    } catch (error) {
+      console.error('Error fetching alarms:', error);
+    }
+  };
+
+  // Update data every 5 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCells(prev =>
-        prev.map(c => ({
-          ...c,
-          soc: Math.min(100, Math.max(20, c.soc + (Math.random() * 2 - 1)))
-        }))
-      );
-      setTemps(prev => [
-        ...prev.slice(1),
-        Math.random() * (35 - 20) + 20
-      ]);
-      setLastUpdate(new Date());
-    }, 1000);
+    const fetchAllData = () => {
+      fetchBatteryData();
+      fetchTemperatureData();
+      fetchSystemOverview();
+      fetchActiveAlarms();
+    };
+
+    fetchAllData();
+    const interval = setInterval(fetchAllData, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="p-4 text-white bg-[#0a0f2c] min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Battery Management Dashboard</h1>
-      <BatteryModule module={{ name: "M1 MOD_1", voltage: 47, soc: 66.7, temp: 25, imbalance: 13.1 }} />
-      <div className="grid grid-cols-2 gap-8 my-4">
-        <div>
-          <h2 className="font-semibold mb-2">State of Charge per Cell</h2>
-          <CellGrid cells={cells} />
-        </div>
-        <div>
-          <h2 className="font-semibold mb-2">Temperature Timeline</h2>
-          <TempChart temps={temps} />
-        </div>
+    <div className="dashboard-container">
+      {/* Left Panel */}
+      <div className="left-panel">
+        <LeftPanelButtons 
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+        />
       </div>
-      <AlarmStatus status="Fault" />
-      <TimestampBar time={lastUpdate} />
+
+      {/* Main Dashboard */}
+      <div className="main-dashboard">
+        {/* Top Section */}
+        <div className="top-section">
+          {/* Battery Module Info */}
+          <BatteryModule 
+            batteryId={selectedBattery}
+            data={systemOverview}
+            temperatureData={temperatureData}
+          />
+
+          {/* Right Side Charts and Info */}
+          <div className="right-info-panel">
+            <AlarmStatus alarms={activeAlarms} />
+            <TemperatureBar 
+              temperatureData={temperatureData}
+              minTemp={13.5}
+              maxTemp={27.8}
+            />
+          </div>
+        </div>
+
+        {/* Cell Grid */}
+        <div className="cell-grid-section">
+          <CellGrid 
+            cells={batteryData?.cells || []}
+            onCellSelect={setSelectedBattery}
+          />
+        </div>
+
+        {/* Bottom Charts */}
+        <div className="charts-section">
+          <div className="chart-container">
+            <TempChart 
+              data={temperatureData}
+              width={400}
+              height={200}
+            />
+          </div>
+          <div className="chart-container">
+            <SocChart 
+              data={batteryData?.cells || []}
+              width={400}
+              height={200}
+            />
+          </div>
+        </div>
+
+        {/* Timestamp Bar */}
+        <TimestampBar timestamp={batteryData?.timestamp} />
+      </div>
     </div>
   );
-}
+};
+
+export default Dashboard;

@@ -1,52 +1,60 @@
-#data_loader.py
-from scipy.io import loadmat
-import mysql.connector
+# backend/data_loader.py
 import os
-from dotenv import load_dotenv
+import scipy.io
+import pandas as pd
+from logging_config import setup_logger
+from database import insert_dataframe
 
-load_dotenv()
+logger = setup_logger(__name__)
 
-def get_db_connection():
-    return mysql.connector.connect(
-        host=os.getenv("MYSQL_HOST"),
-        user=os.getenv("MYSQL_USER"),
-        password=os.getenv("MYSQL_PASSWORD"),
-        database=os.getenv("MYSQL_DB"),
-        port=int(os.getenv("MYSQL_PORT", 3306))
-    )
+class MatToDataFrame:
+    def __init__(self, folder_path):
+        self.folder_path = folder_path
+        self.dataframes = {}  # maps 'B0005' → DataFrame
 
-def load_mat(file_path, battery_id):
-    mat = loadmat(file_path)
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    def load_all(self, insert_to_db=True):
+        for file in os.listdir(self.folder_path):
+            if file.endswith(".mat"):
+                file_path = os.path.join(self.folder_path, file)
+                key = os.path.splitext(file)[0]  # e.g. B0005
+                try:
+                    mat = scipy.io.loadmat(file_path)
+                    if key in mat and 'cycle' in mat[key].dtype.names:
+                        cycles = mat[key]['cycle'][0][0]
+                        df = self.parse_cycles(cycles, key)
+                        self.dataframes[key] = df
+                        logger.info(f"Loaded {key}: {len(df)} records")
+                        if insert_to_db:
+                            insert_dataframe(df)
+                    else:
+                        logger.warning(f"{key} does not contain 'cycle'")
+                except Exception as e:
+                    logger.error(f"Error loading {file}: {e}")
+        return self.dataframes
 
-    for i, cycle in enumerate(mat['cycle'][0]):
-        op_type = cycle['type'][0]
-        data = cycle['data']
-        if op_type in ['charge', 'discharge']:
+    def parse_cycles(self, cycles, battery_id):
+        records = []
+        for i, cycle in enumerate(cycles[0]):
+            op_type = cycle['type'][0]
+            if op_type not in ['charge', 'discharge']:
+                continue
+            data = cycle['data']
+            time = data['Time'][0][0][0]
             voltage = data['Voltage_measured'][0][0][0]
             current = data['Current_measured'][0][0][0]
             temp = data['Temperature_measured'][0][0][0]
-            time = data['Time'][0][0][0]
-            capacity = (
-                data['Capacity'][0][0][0]
-                if 'Capacity' in data.dtype.names else
-                [0] * len(voltage)
-            )
+            cap = data['Capacity'][0][0][0] if 'Capacity' in data.dtype.names else [0] * len(time)
 
-            for v, c, t, cap, tm in zip(voltage, current, temp, capacity, time):
-                cursor.execute("""
-                    INSERT INTO battery_readings (battery_id, cycle, operation_type, voltage, current, temperature, capacity, time)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """, (battery_id, i, op_type, float(v), float(c), float(t), float(cap), float(tm)))
+            for t, v, c, tm, cp in zip(time, voltage, current, temp, cap):
+                records.append({
+                    "battery_id": battery_id,
+                    "cycle": i,
+                    "operation": op_type,
+                    "time": float(t),
+                    "voltage": float(v),
+                    "current": float(c),
+                    "temperature": float(tm),
+                    "capacity": float(cp)
+                })
 
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-# Optional CLI trigger
-if __name__ == "__main__":
-    load_mat("dataset/B0005.mat", "B0005")
-    load_mat("dataset/B0006.mat", "B0006")
-    load_mat("dataset/B0007.mat", "B0007")
-    load_mat("dataset/B0018.mat", "B0018")
+        return pd.DataFrame(records)

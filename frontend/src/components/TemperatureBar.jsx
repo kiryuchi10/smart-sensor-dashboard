@@ -1,14 +1,15 @@
-export default function TemperatureBar({ min, max, temps }) {
+const TemperatureBar = ({ temperatureData, minTemp, maxTemp }) => {
+  const data = temperatureData || [];
+
   return (
-    <div className="flex flex-col items-center">
-      <div className="text-sm">Temp Range: {min}°C - {max}°C</div>
-      <div className="flex gap-2 mt-1">
-        {temps.map((t, i) => (
-          <div key={i} className={`text-sm p-1 ${t > 27 ? 'bg-red-500' : 'bg-blue-400'}`}>
-            {t.toFixed(1)}°C
-          </div>
-        ))}
-      </div>
+    <div className="temperature-bar">
+      {data.map((temp, idx) => (
+        <div key={idx} className="temp-bar-segment">
+          <div className="temp-value">{temp.toFixed(1)}°C</div>
+        </div>
+      ))}
     </div>
   );
-}
+};
+
+export default TemperatureBar;

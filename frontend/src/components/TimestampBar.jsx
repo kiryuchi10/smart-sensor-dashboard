@@ -1,7 +1,16 @@
-export default function TimestampBar({ time }) {
+// frontend/src/components/TimestampBar.jsx
+import React from 'react';
+
+const TimestampBar = ({ timestamp }) => {
+  if (!timestamp) return null;
+
+  const formattedTime = new Date(timestamp).toLocaleTimeString();
+
   return (
-    <div className="text-sm text-center text-gray-300 mt-4">
-      Last Updated: {time.toLocaleTimeString()}
+    <div className="timestamp-bar">
+      <span>Last Updated: {formattedTime}</span>
     </div>
   );
-}
+};
+
+export default TimestampBar;
