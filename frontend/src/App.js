@@ -1,10 +1,11 @@
 import React from 'react';
-import Dashboard from './components/Dashboard'; // make sure the path matches your folder structure
+import BatteryModuleGroup from './components/BatteryModuleGroup';
 import './components/Dashboard.css';
+
 function App() {
   return (
     <div className="App">
-      <Dashboard />
+      <BatteryModuleGroup />
     </div>
   );
 }

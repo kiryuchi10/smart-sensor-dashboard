@@ -1,57 +1,41 @@
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: #0b1120;
+.battery-module-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.battery-module {
+  border: 2px solid black;
+  padding: 10px;
+  background: #0c0c0c;
   color: white;
-  font-family: sans-serif;
 }
 
-.dashboard-sidebar {
-  flex: 1;
-  padding: 1rem;
+.temperature-bar {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  background-color: #111827;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.dashboard-main {
-  flex: 4;
-  padding: 1rem;
+.current-bar-container {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.timestamp-bar {
-  padding: 8px;
-  color: white;
-  font-size: 0.9rem;
-  background-color: #1e1e1e;
-  display: flex;
-  justify-content: flex-end;
-}
-.timestamp-label {
-  margin-right: 8px;
-  font-weight: bold;
-}
-.timestamp-value {
-  color: #00d4ff;
-}
-
-.dashboard-row {
-  display: flex;
-  gap: 1rem;
-}
-
-.dashboard-card {
-  flex: 1;
-  background-color: #1f2937;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 10px #00000055;
-}
-
-.full-width {
+.current-bar {
   width: 100%;
+  background: #444;
+  height: 20px;
+  position: relative;
+}
+
+.current-indicator {
+  position: absolute;
+  height: 100%;
+  width: 3px;
+  background-color: red;
+  left: 50%; /* dynamically change this using inline style left: `${percent}%` */
 }

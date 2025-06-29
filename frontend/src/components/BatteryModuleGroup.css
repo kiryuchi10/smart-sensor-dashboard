@@ -1,0 +1,74 @@
+/* BatteryModuleGroup.css */
+.battery-module-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 16px;
+  padding: 20px;
+  border: 2px dashed #444;
+  background-color: #0b0c10;
+  margin-top: 10px;
+}
+
+.battery-module-container {
+  flex: 0 1 45%;
+  border: 1px solid #aaa;
+  padding: 10px;
+  background-color: #1f1f1f;
+  color: #f0f0f0;
+}
+
+/* Cell Grid */
+.cell-grid-section {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 20px;
+  border: 2px dotted #666;
+}
+
+.cell-tile {
+  background-color: #2e8b57;
+  color: #fff;
+  border-radius: 8px;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+}
+
+/* Chart Container */
+.charts-section {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 20px;
+  gap: 20px;
+}
+
+.chart-container {
+  width: 45%;
+  background-color: #191919;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* Responsive Layout */
+@media screen and (max-width: 768px) {
+  .battery-module-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cell-grid-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .chart-container {
+    width: 90%;
+  }
+}
