@@ -1,4 +1,4 @@
-# backend/logging_config.py
+# FIXED logging_config.py
 import logging
 import sys
 

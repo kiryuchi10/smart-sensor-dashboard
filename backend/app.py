@@ -17,38 +17,49 @@ def health():
         'service': 'BMS Dashboard API'
     })
 
-@app.route('/api/battery/tables')
-def get_tables():
-    query = "SHOW TABLES"
+@app.route('/api/battery/tables', methods=['GET'])
+def get_battery_tables():
+    # List all battery_* tables
+    query = "SHOW TABLES LIKE 'battery_%'"
     result = execute_query(query)
     if result is None:
-        return jsonify({"error": "DB query failed"}), 500
-    tables = [list(row.values())[0] for row in result]
-    return jsonify({"tables": tables})
+        return jsonify({'error': 'Database query failed'}), 500
 
-@app.route('/api/battery/data/<table_name>')
+    tables = [list(row.values())[0] for row in result if row]
+    return jsonify({'tables': tables})
+
+@app.route('/api/battery/data/<table_name>', methods=['GET'])
 def get_battery_data_by_table(table_name):
     query = f"""
-    SELECT battery_id, ROUND(AVG(voltage),2) AS avg_voltage, ROUND(AVG(capacity)*100,1) AS avg_soc,
-           ROUND(AVG(temperature),1) AS avg_temperature, MAX(cycle) AS latest_cycle
+    SELECT battery_id,
+           ROUND(AVG(voltage),2) AS avg_voltage,
+           ROUND(AVG(soc),1) AS avg_soc,
+           ROUND(AVG(temperature),1) AS avg_temperature,
+           MAX(cycle) AS latest_cycle
     FROM `{table_name}`
-    GROUP BY battery_id ORDER BY battery_id
+    GROUP BY battery_id
+    ORDER BY battery_id
     """
     result = execute_query(query)
     if result is None:
         return jsonify({'error': 'DB query failed'}), 500
     return jsonify({'cells': result})
 
-@app.route('/api/battery/tables', methods=['GET'])
-def get_battery_tables():
-    query = "SHOW TABLES LIKE 'battery_%'"
+@app.route('/api/battery/cells', methods=['GET'])
+def get_all_cell_data():
+    table = request.args.get('table')
+    if not table:
+        return jsonify({'error': 'Missing table name'}), 400
+
+    query = f"""
+    SELECT id, battery_id, voltage, soc, temperature, cycle, time
+    FROM `{table}`
+    ORDER BY id DESC LIMIT 20
+    """
     result = execute_query(query)
     if result is None:
-        return jsonify({'error': 'Database query failed'}), 500
-
-    tables = [list(row.values())[0] for row in result]
-    return jsonify({'tables': tables})
-
+        return jsonify({'error': 'DB query failed'}), 500
+    return jsonify({'cells': result})
 
 if __name__ == '__main__':
     app.run(debug=True)
