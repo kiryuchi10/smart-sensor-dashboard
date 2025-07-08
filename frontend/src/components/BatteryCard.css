@@ -1,0 +1,15 @@
+.battery-card {
+  width: 100px;
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  margin: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 0 4px white;
+}
+
+.battery-card.fault {
+  background-color: #f44336;
+}

@@ -112,12 +112,10 @@ const Dashboard = () => {
         </div>
 
         {/* Cell Grid */}
-        <div className="cell-grid-section">
-          <CellGrid 
-            cells={batteryData?.cells || []}
-            onCellSelect={setSelectedBattery}
-          />
-        </div>
+      <div className="cell-grid-section">
+        <CellGrid />
+      </div>
+
 
         {/* Bottom Charts */}
         <div className="charts-section">

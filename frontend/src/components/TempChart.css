@@ -1,0 +1,11 @@
+.temp-chart-container {
+  background-color: #121212;
+  border: 2px solid white;
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+}
+.chart-title {
+  text-align: center;
+  margin-bottom: 8px;
+}

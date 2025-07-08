@@ -61,5 +61,37 @@ def get_all_cell_data():
         return jsonify({'error': 'DB query failed'}), 500
     return jsonify({'cells': result})
 
+@app.route('/api/battery/cards', methods=['GET'])
+def get_battery_cards():
+    tables = ['battery_b0005', 'battery_b0006', 'battery_b0007', 'battery_b0018']
+    response = []
+
+    for table in tables:
+        query = f"""
+        SELECT battery_id,
+               ROUND(AVG(voltage),2) as voltage,
+               ROUND(AVG(soc),2) as soc
+        FROM `{table}`
+        GROUP BY battery_id
+        LIMIT 1
+        """
+        result = execute_query(query)
+
+        if result:
+            response.append({
+                "id": table.replace("battery_", "").upper(),
+                "voltage": result[0]["voltage"],
+                "soc": result[0]["soc"]
+            })
+        else:
+            logger.warning(f"[{table}] No result returned from DB.")
+
+    if not response:
+        return jsonify({"error": "No card data found"}), 404
+
+    return jsonify({"cards": response})
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)

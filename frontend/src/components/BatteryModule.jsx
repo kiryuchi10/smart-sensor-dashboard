@@ -1,9 +1,7 @@
-// FILE: frontend/src/components/BatteryModule.jsx
-
 import React from 'react';
 import './BatteryModule.css'; // Make sure this is styled correctly
 
-const BatteryModule = ({ batteryId, data, temperatureData }) => {
+const BatteryModule = ({ batteryId, data, temperatureData, onBackClick, onAlarmClick }) => {
   const voltage = data?.avg_voltage || 47.0;
   const soc = data?.avg_soc || 66.7;
   const temperature = data?.avg_temperature || 18.5;
@@ -21,7 +19,6 @@ const BatteryModule = ({ batteryId, data, temperatureData }) => {
 
   return (
     <div className="battery-module">
-      
       {/* === TOP HEADER SECTION === */}
       <div className="module-top">
         <span className="battery-id">{batteryId}</span>
@@ -63,8 +60,8 @@ const BatteryModule = ({ batteryId, data, temperatureData }) => {
       {/* === SECONDARY BUTTONS AND STATUS === */}
       <div className="bottom-section">
         <div className="small-buttons">
-          <button>Back</button>
-          <button>Alarm Screen</button>
+          <button onClick={() => onBackClick?.(batteryId)}>Back</button>
+          <button onClick={() => onAlarmClick?.(batteryId)}>Alarm Screen</button>
         </div>
         <div className="soh-box">
           <div className="label">SoH</div>

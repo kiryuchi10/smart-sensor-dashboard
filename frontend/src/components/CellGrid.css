@@ -1,0 +1,17 @@
+.cell-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  padding: 8px;
+  border: 2px solid white;
+}
+
+.cell-tile {
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  color: white;
+  padding: 4px;
+  font-size: 0.85rem;
+  text-align: center;
+  border-radius: 6px;
+}

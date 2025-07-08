@@ -1,20 +1,21 @@
-// frontend/src/components/CellGrid.jsx
-import React from 'react';
+// src/components/CellGrid.jsx
+import React, { useEffect, useState } from 'react';
+import BatteryCard from './BatteryCard';
 import './CellGrid.css';
 
-const CellGrid = ({ cells, onCellSelect }) => {
+const CellGrid = () => {
+  const [cards, setCards] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/battery/cards')
+      .then(res => res.json())
+      .then(data => setCards(data.cards || []));
+  }, []);
+
   return (
     <div className="cell-grid">
-      {cells.map((cell) => (
-        <div
-          className={`cell-tile status-${cell.status}`}
-          key={cell.id}
-          onClick={() => onCellSelect(cell.id)}
-        >
-          <div className="cell-id">{cell.id}</div>
-          <div className="cell-voltage">{cell.voltage}V</div>
-          <div className="cell-soc">SoC {cell.soc}%</div>
-        </div>
+      {cards.map((cell, idx) => (
+        <BatteryCard key={idx} id={cell.id} voltage={cell.voltage} soc={cell.soc} />
       ))}
     </div>
   );
