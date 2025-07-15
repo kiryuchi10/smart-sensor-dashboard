@@ -1,0 +1,122 @@
+/* src/components/EnhancedCellGrid.css */
+.enhanced-cell-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  padding: 20px;
+  background-color: #1a1a2e;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.cell-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  min-height: 80px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.cell-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Normal cells - Green */
+.cell-card.normal {
+  background: linear-gradient(135deg, #4CAF50, #66BB6A);
+  color: white;
+  border-color: #4CAF50;
+}
+
+/* Warning cells - Red */
+.cell-card.warning {
+  background: linear-gradient(135deg, #f44336, #ef5350);
+  color: white;
+  border-color: #f44336;
+  animation: pulse-warning 2s infinite;
+}
+
+/* Low cells - Orange */
+.cell-card.low {
+  background: linear-gradient(135deg, #FF9800, #FFB74D);
+  color: white;
+  border-color: #FF9800;
+}
+
+.cell-id {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+.cell-voltage {
+  font-size: 14px;
+  margin-bottom: 3px;
+  opacity: 0.9;
+}
+
+.cell-soc {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 16px;
+}
+
+/* Warning pulse animation */
+@keyframes pulse-warning {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(244, 67, 54, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .enhanced-cell-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .enhanced-cell-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 15px;
+  }
+  
+  .cell-card {
+    min-height: 70px;
+    padding: 12px 8px;
+  }
+  
+  .cell-id {
+    font-size: 16px;
+  }
+  
+  .cell-voltage {
+    font-size: 12px;
+  }
+  
+  .cell-soc {
+    font-size: 10px;
+  }
+}

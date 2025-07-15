@@ -91,6 +91,47 @@ def get_battery_cards():
 
     return jsonify({"cards": response})
 
+@app.route('/api/battery/enhanced-cells', methods=['GET'])
+def get_enhanced_cell_data():
+    """Get enhanced cell data for the new UI with individual cell information"""
+    tables = ['battery_b0005', 'battery_b0006', 'battery_b0007']
+    all_cells = []
+    
+    for i, table in enumerate(tables):
+        query = f"""
+        SELECT 
+            battery_id,
+            ROUND(voltage, 3) as voltage,
+            ROUND(soc, 1) as soc,
+            ROUND(temperature, 1) as temperature,
+            cycle,
+            time,
+            created_at
+        FROM `{table}`
+        ORDER BY id DESC 
+        LIMIT 4
+        """
+        result = execute_query(query)
+        
+        if result:
+            for j, cell in enumerate(result):
+                cell_id = f"E{i*4 + j + 1}"  # Generate E1, E2, E3... E12
+                all_cells.append({
+                    "cell_id": cell_id,
+                    "battery_id": cell["battery_id"],
+                    "voltage": float(cell["voltage"]),
+                    "soc": float(cell["soc"]),
+                    "temperature": float(cell["temperature"]),
+                    "cycle": cell["cycle"],
+                    "timestamp": cell["created_at"].isoformat() if cell["created_at"] else None
+                })
+    
+    return jsonify({
+        "cells": all_cells,
+        "total_cells": len(all_cells),
+        "timestamp": datetime.now().isoformat()
+    })
+
 
 
 if __name__ == '__main__':

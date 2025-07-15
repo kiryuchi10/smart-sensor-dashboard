@@ -1,7 +1,7 @@
 // frontend/src/components/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import BatteryModule from './BatteryModule';
-import CellGrid from './CellGrid';
+import EnhancedCellGrid from './EnhancedCellGrid';
 import TempChart from './TempChart';
 import SocChart from './SocChart';
 import AlarmStatus from './AlarmStatus';
@@ -111,10 +111,10 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Cell Grid */}
-      <div className="cell-grid-section">
-        <CellGrid />
-      </div>
+        {/* Enhanced Cell Grid */}
+        <div className="cell-grid-section">
+          <EnhancedCellGrid />
+        </div>
 
 
         {/* Bottom Charts */}

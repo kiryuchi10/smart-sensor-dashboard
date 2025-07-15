@@ -1,47 +1,114 @@
-.dashboard-layout {
+/* Enhanced Dashboard Layout */
+.dashboard-container {
   display: flex;
   height: 100vh;
-  background-color: #121212;
+  background: linear-gradient(135deg, #0f0f23, #1a1a2e);
   color: white;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
 }
 
-.left-panel-wrapper {
-  width: 180px;
-  padding: 10px;
-  border-right: 3px solid white;
-}
-
-.main-panel-wrapper {
-  flex: 1;
+.left-panel {
+  width: 200px;
+  background: linear-gradient(180deg, #16213e, #0f3460);
+  border-right: 2px solid #4a90e2;
   display: flex;
   flex-direction: column;
   padding: 10px;
-  gap: 10px;
 }
 
-.battery-modules-section {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  border: 3px solid white;
-  padding: 10px;
-}
-
-.charts-row {
-  display: flex;
-  gap: 20px;
-  border: 3px solid white;
-  padding: 10px;
-  justify-content: space-around;
-}
-
-.chart-box {
+.main-dashboard {
   flex: 1;
-  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  gap: 15px;
+  overflow-y: auto;
 }
 
-.bottom-bar {
-  border: 3px solid white;
+.top-section {
+  display: flex;
+  gap: 20px;
+  min-height: 300px;
+}
+
+.right-info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 300px;
+}
+
+.cell-grid-section {
+  background: rgba(26, 26, 46, 0.8);
+  border-radius: 12px;
   padding: 10px;
+  border: 1px solid #4a90e2;
+}
+
+.charts-section {
+  display: flex;
+  gap: 20px;
+  min-height: 250px;
+}
+
+.chart-container {
+  flex: 1;
+  background: rgba(26, 26, 46, 0.6);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid #4a90e2;
+}
+
+/* Navigation buttons styling */
+.nav-button {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  margin: 5px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+  background: linear-gradient(135deg, #357abd, #2968a3);
+  transform: translateX(5px);
+}
+
+.nav-button.active {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  box-shadow: 0 0 15px rgba(40, 167, 69, 0.4);
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .top-section {
+    flex-direction: column;
+  }
+  
+  .charts-section {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+  
+  .left-panel {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .main-dashboard {
+    padding: 10px;
+    gap: 10px;
+  }
 }

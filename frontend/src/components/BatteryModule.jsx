@@ -9,12 +9,17 @@ const BatteryModule = ({ batteryId, data, temperatureData, onBackClick, onAlarmC
   const current = 0;
   const stringHealth = 100.0;
   const cellAvgVoltage = 3.92;
+  const alarmStatus = 'Fault'; // This should come from your alarm system
 
-  const tempSensors = temperatureData?.slice(-7) || [
-    { id: 1, value: 27.8 }, { id: 2, value: 26.6 },
-    { id: 3, value: 26.1 }, { id: 4, value: 26.9 },
-    { id: 5, value: 27.4 }, { id: 6, value: 25.9 },
-    { id: 7, value: 18.5 }
+  const tempSensors = temperatureData?.slice(-8) || [
+    { id: 1, value: 27.8, status: 'warning' }, 
+    { id: 2, value: 26.6, status: 'normal' },
+    { id: 3, value: 26.1, status: 'normal' }, 
+    { id: 4, value: 26.9, status: 'normal' },
+    { id: 5, value: 27.4, status: 'normal' }, 
+    { id: 6, value: 26.7, status: 'normal' },
+    { id: 7, value: 25.9, status: 'normal' },
+    { id: 8, value: 18.5, status: 'low' }
   ];
 
   return (
@@ -54,6 +59,14 @@ const BatteryModule = ({ batteryId, data, temperatureData, onBackClick, onAlarmC
           <div className="label">Current</div>
           <div className="value">{current}A</div>
           <div className="sub-label">Discharge Max</div>
+        </div>
+        <div className="metric-box">
+          <div className="label">Discharge Max</div>
+          <div className="value">500A</div>
+        </div>
+        <div className="alarm-status-box">
+          <div className="alarm-label">Alarm status</div>
+          <div className={`alarm-value ${alarmStatus.toLowerCase()}`}>{alarmStatus}</div>
         </div>
       </div>
 
