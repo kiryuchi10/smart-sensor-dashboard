@@ -7,7 +7,7 @@ const EnhancedCellGrid = () => {
   const [loading, setLoading] = useState(true);
 
   // Generate 12 cells with realistic data based on your database structure
-  const generateCellData = (apiData) => {
+  const generateCellData = (apiCells) => {
     const baseCells = [
       { id: 'E1', voltage: 3.90, soc: 66.7, status: 'normal' },
       { id: 'E2', voltage: 3.91, soc: 67.9, status: 'normal' },
@@ -23,21 +23,18 @@ const EnhancedCellGrid = () => {
       { id: 'E12', voltage: 3.99, soc: 79.8, status: 'warning' }
     ];
 
-    // If we have real API data, use it to update some cells
-    if (apiData && apiData.length > 0) {
-      apiData.forEach((cell, index) => {
+    // If we have API data, use it first, then fill remaining with defaults
+    if (apiCells && apiCells.length > 0) {
+      // Use API data for available cells
+      apiCells.forEach((cell, index) => {
         if (index < baseCells.length) {
-          baseCells[index].voltage = parseFloat(cell.voltage) || baseCells[index].voltage;
-          baseCells[index].soc = parseFloat(cell.soc) || baseCells[index].soc;
-          
-          // Determine status based on voltage and SoC
-          if (cell.voltage > 3.95 || cell.soc > 75) {
-            baseCells[index].status = 'warning';
-          } else if (cell.voltage < 3.85 || cell.soc < 60) {
-            baseCells[index].status = 'low';
-          } else {
-            baseCells[index].status = 'normal';
-          }
+          baseCells[index] = {
+            id: cell.id,
+            voltage: cell.voltage,
+            soc: cell.soc,
+            status: cell.status,
+            temperature: cell.temperature
+          };
         }
       });
     }
@@ -99,7 +96,7 @@ const EnhancedCellGrid = () => {
     // Update every 5 seconds for real-time data
     const interval = setInterval(fetchCellData, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchCellData]);
 
   const getCellClassName = (status) => {
     switch (status) {

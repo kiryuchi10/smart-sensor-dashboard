@@ -77,6 +77,23 @@ def test_battery_cards():
     except Exception as e:
         print(f"❌ Exception in /battery/cards: {e}")
 
+def test_enhanced_cells():
+    print("\n🔍 Testing /api/battery/enhanced-cells ...")
+    try:
+        res = requests.get(f"{API_BASE_URL}/battery/enhanced-cells")
+        if res.status_code == 200:
+            data = res.json()
+            cells = data.get("cells", [])
+            print(f"✅ Retrieved {len(cells)} enhanced cell entries:")
+            for cell in cells[:6]:  # Print first 6 cells
+                print(f"   - {cell['cell_id']}: Voltage={cell['voltage']}V, SoC={cell['soc']}%, Temp={cell['temperature']}°C")
+            print(f"   - Total cells: {data.get('total_cells', 0)}")
+            print(f"   - Timestamp: {data.get('timestamp', 'N/A')}")
+        else:
+            print(f"❌ Enhanced cells endpoint failed: {res.status_code}")
+    except Exception as e:
+        print(f"❌ Exception in /battery/enhanced-cells: {e}")
+
 def run_all_tests():
     print("🚀 Running all backend tests for BMS Dashboard API...\n")
     test_health()
@@ -88,6 +105,7 @@ def run_all_tests():
             test_all_cell_data(table)
 
     test_battery_cards()
+    test_enhanced_cells()
 
     print("\n🎉 All backend API tests completed.")
 

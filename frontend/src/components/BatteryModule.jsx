@@ -94,7 +94,7 @@ const BatteryModule = ({ batteryId, data, temperatureData, onBackClick, onAlarmC
           <div className="temp-sensor-label">Module Temperature Sensors</div>
           <div className="temps">
             {tempSensors.map(sensor => (
-              <div className="temp-box" key={sensor.id}>
+              <div className={`temp-box ${sensor.status}`} key={sensor.id}>
                 {sensor.value.toFixed(1)}°C
               </div>
             ))}
